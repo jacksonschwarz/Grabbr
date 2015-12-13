@@ -194,11 +194,13 @@
 			$("body").keypress(function(){
 				if(event.which == 13)
 				{
-					tracing=true;
-					newLevel();
-					$("#scoreboard").show();
-					$("#scoreboard").text(""+scoreCount);
-					$("#scoreboard").css("font-size", "83vh");
+					if(!paused){
+						tracing=true;
+						newLevel();
+						$("#scoreboard").show();
+						$("#scoreboard").text(""+scoreCount);
+						$("#scoreboard").css("font-size", "83vh");
+					}
 				}
 				if(event.which==32)
 				{
