@@ -197,9 +197,12 @@
 					if(!paused){
 						tracing=true;
 						newLevel();
+						$(".obstacles").fadeTo(100, 1);
+						$(".scores").fadeTo(100, 1);
 						$("#scoreboard").show();
 						$("#scoreboard").text(""+scoreCount);
 						$("#scoreboard").css("font-size", "83vh");
+						paused=false;
 					}
 				}
 				if(event.which==32)
@@ -220,6 +223,7 @@
 						paused=false;
 						randomObstacles();
 						randomScores();
+						$("scoreboard").css("font-size", "83vh");
 						tracing=true;
 					}
 				}
