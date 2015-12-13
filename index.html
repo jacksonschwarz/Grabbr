@@ -100,8 +100,9 @@
 	<script>
 		$(document).ready(function(){
 			var tracing=false;
+			var paused=false;
+			
 			var scoreCount=0;
-			var pastScore=0;
 			var sucessSound=document.getElementById("scoreSound");
 			var hitSound=document.getElementById("hitSound");
 			var scores=[0];
@@ -129,8 +130,8 @@
 				//places scores
 				for(var i=1;i<6;i++)
 				{
-					var randX=20+Math.round(Math.random()*innerWidth)-50;
-					var randY=20+Math.round(Math.random()*innerHeight)-70;
+					var randX=Math.round(Math.random()*innerWidth)-scoreWidth*4;
+					var randY=20+Math.round(Math.random()*innerHeight)-scoreHeight*4;
 					$("#score"+i).animate({
 						left: randX+"px",
 						top: randY+"px"
@@ -143,8 +144,8 @@
 				//places obstacles
 				for(var i=1;i<11;i++)
 				{
-					var randX=20+Math.round(Math.random()*innerWidth)-50;
-					var randY=20+Math.round(Math.random()*innerHeight)-70;
+					var randX=20+Math.round(Math.random()*innerWidth)-24;
+					var randY=20+Math.round(Math.random()*innerHeight)-24;
 					$("#obstacle"+i).animate({
 						left: randX+"px",
 						top: randY+"px"
@@ -168,7 +169,8 @@
 				if(scoreCount == calculateMax(scores))
 					highScore=scoreCount;
 				scoreCount=0;
-				speed=2000;
+				
+				speed=1500;
 				tracing=false;
 				points="";
 				$("#path").attr("points", "");
@@ -189,11 +191,6 @@
 				randomObstacles();
 				$("#restart-block").hide();
 			};
-			//Starts the game, traces the line
-			/*$("#start").click(function(){
-				tracing=true;
-				newLevel();
-			});*/
 			$("body").keypress(function(){
 				if(event.which == 13)
 				{
@@ -205,10 +202,24 @@
 				}
 				if(event.which==32)
 				{
-					$(".obstacles").stop(true);
-					$("#scoreboard").text("Paused. press Enter to resume");
-					$("#scoreboard").css("font-size", "10vh");
-					tracing=false;
+					if(!paused)
+					{
+						paused=true;
+						$(".obstacles").stop(true);
+						$(".obstacles").fadeTo(500, 0.25);
+						$(".scores").fadeTo(500, 0.25);
+						$("#scoreboard").text("Paused. press the Spacebar to resume");
+						$("#scoreboard").css("font-size", "10vh");
+						tracing=false;
+					}
+					else{
+						$(".obstacles").fadeTo(100, 1);
+						$(".scores").fadeTo(100, 1);
+						paused=false;
+						randomObstacles();
+						randomScores();
+						tracing=true;
+					}
 				}
 			});
 			//Traces the line
@@ -242,7 +253,7 @@
 							$(".scores").animate({
 								height: scoreHeight+"vh",
 								width: scoreWidth+"vh"
-							}, 1000);
+							}, 500);
 						}
 					}
 				}
@@ -257,12 +268,16 @@
 			});
 			$(window).resize(function(){
 				$("#restart-block").css("font-size", "10vh");
-				$("#scoreboard").css("font-size", "83vh");
-				if(tracing){
+				if(tracing && !paused){
+					$("#scoreboard").css("font-size", "83vh");
 					$(".obstacles").stop(true);
 					$(".scores").stop(true);
 					randomObstacles();
 					randomScores();
+				}
+				if(paused)
+				{
+					$("#scoreboard").css("font-size", "10vh");
 				}
 
 			});
