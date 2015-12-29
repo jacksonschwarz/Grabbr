@@ -2,117 +2,308 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title></title>
+		<title>Grabbr</title>
 	</head>
 	<style>
+		@import url('http://fonts.googleapis.com/css?family=Kavoon');
+		@import url('http://fonts.googleapis.com/css?family=Geostar+Fill');
 		/*basic styling*/
-		body{
-			background-color: black;
+		*{
 			cursor: pointer;
-			overflow: hidden;
 		}
-		/*Defining the scores class and individual positions of score*/
+		body{
+			background-color: cadetblue;
+			overflow: hidden;
+			cursor: pointer;
+		}
+		/*Defining the scores class*/
 		.scores{
 			position:absolute;
 			height:12vh;
 			width:12vh;
-			border-radius: 100%;
-			background-color: #00cc00;
-			border: 5px groove #1aff1a;
+			border-radius: 10%;
+			background-color: #4dff4d;
+			border: 5px dashed green;
 			top:-150px;
-			box-shadow: 0 0 50px white;
+			box-shadow: 0 0 50px black;
+			-webkit-transform: rotate(45deg);
 		}
 			
-		/*defining the obstacle class and individual positions for obstacles*/
+		/*defining the obstacle class*/
 		.obstacles{
 			position:absolute;
 			height:10vh;
 			width: 10vh;
-			background-color:red;
+			background-color:#861700;
 			border-radius: 100%;
-			border: 5px groove #e62000;
+			border: 5px dashed #b31e00;
 			top: -150px;
-			box-shadow: 0 0 25px red;
+			left: -150px;
+			box-shadow: 0 0 50px black;
+		}
+		#player{
+			height: 7vh;
+			width: 7vh;
+			background-color: darkblue;
+			border: 10px dotted blue;
+			border-radius: 25%;
+			
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-top: -7vh;
+			margin-left: -7vh;
+			display:none;
+		}
+		/*css about the menu*/
+		.menu{
+			font-family:Kavoon,Courier, sans-serif;
+			color: white;
+			text-decoration: none;
+			cursor: pointer;
+			text-shadow: 2px 2px 2px black;
+		}
+		#high-score{
+			float:right;
+			position: absolute;
+			left: 1050px;
+			top: 10px;
+			font-size: 25px;
+			display:none;
+		}
+
+		#title-card{
+			font-size: 200px;
+			text-align: center;
+			color: orange;
+			opacity: 1;
+		}
+		#scores-button{
+			font-size: 50px;
+			float: left;
+			color: chartreuse;
+		}
+		#scores-button:hover{
+			font-size: 55px;
+			opacity: 0.9;
+			text-shadow: 0 0 25px black;
+		}
+		#instruction-button{
+			font-size: 50px;
+			float: right;
+			color: red;
+		}
+		#instruction-button:hover{
+			font-size: 55px;
+			text-shadow: 0 0 25px black;
+		}
+		#instructions{
+			display:none;
+			font-size: 50px;
+			text-align: center;
+			position: absolute;
+			top: 25%;
+			opacity: 1;
+			text-shadow: 2px 2px 2px black;
+		}
+		#play-button{
+			font-size: 100px;
+			position: absolute;
+			left: 41%;
+			top: 50%;
+			color: blue;
+
+		}
+		#play-button:hover{
+			font-size: 110px;
+			left: 40%;
+			text-shadow: 0 0 25px black;
 		}
 		#restart-block{
-			height:100%;
-			width:100%;
-			background-color:;
-			text-align: center;
-			vertical-align: middle;
-			font-size: 8vh;
-			font-family: Courier, sans-serif;
-			color: white;
-			text-shadow: 2px 2px black;
-			display:;
+			display: none;
 		}
-		#scoreboard{
-			color: white;
-			text-align: center;
-			font-family: Courier, sans-serif;
-			font-size: 14vh;
-			opacity: 0.5;
-			cursor: pointer;
+		#back-button{
+			font-size: 75px;
+			color: beige;
+			text-shadow: 4px 4px 2px black;
+		}
+		#back-button:hover{
+			font-size: 80px;
+			text-shadow: 0 0 25px black;
+			color:lightgray;
+		}
+		.gameover{
 			display:none;
+			font-size:55px;
+			text-align: center;
+			font-family: Kavoon,Courier, sans-serif;
+			color: white;
+			opacity: 0.7;
+			cursor: pointer;
+		}
+		#gameover-title{
+			font-size: 70px;
+		}
+		#gameover-back{
+			color:red;
+		}
+		#gameover-back:hover{
+			text-shadow: 0 0 25px black;
+			font-size: 60px;
+		}
+		#gameover-play{
+			color: #4dff4d;
+		}
+		#gameover-play:hover{
+			text-shadow: 0 0 25px black;
+			font-size: 60px;
+		}
+		#nametag{
+			float:right;
+		}
+		#level-notifier{
+			font-family: Kavoon, Courier, sans-serif;
+			color:white;
+			opacity:0.7;
+			font-size:40vh;
+			text-align: center;
+			display:none;
+		}
+		#timer{
+			width: 100%;
+			margin-left: -8px;
+			height: 10px;
+			position: absolute;
+			bottom: 0%;
+			background-color: black;
+			opacity: 0.3;
+			display: none;
+			border-top: 5px solid black;
+		}
+		#scorecount{
+			display: none;
+			font-size: 25px;
 		}
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 	<body>
+				<div id="timer"></div>
+				<p id="nametag" class="menu" style="font-family: Kavoon, Courier, sans-serif;color:white;opacity:0.7">By Jackson Schwarz</p>
 			
-					<div id="scoreboard">
-						0
+				<div id="level-notifier">Level 0</div>
+				<div style="font-family:Kavoon, Courier, sans-serif; color:white;opacity:0.7" id="high-score">
+					High Score: 0
+				</div>
+				<div style="font-family: Kavoon, Courier, sans-serif;color:white;opacity: 0.7" id="scorecount">
+					Score: 0
+				</div>
+				<div style="font-family:Kavoon, Courier, sans-serif; color:white;opacity: 0.7" id="instructions">
+					Click the <span style="color:blue" >BLUE</span> token to begin. Collect the <span style="color: #4dff4d">GREEN</span> gems, while avoiding the  <span style="color: #861700">RED</span> circles,  As the levels progress, you will have less time to collect the gems, and the circles will move faster, so be careful!<br> <span id="back-button">Back</span>
+				</div>
+					<div class="menu" id="title-card">
+						Grabbr
 					</div>
-					<div id="score1" class="scores"></div>
-					<div id="score2" class="scores"></div>
-					<div id="score3" class="scores"></div>
-					<div id="score4" class="scores"></div>
-					<div id="score5" class="scores"></div>
 					
-					
-					<div id="obstacle1" class="obstacles"></div>
-					<div id="obstacle2" class="obstacles"></div>
-					<div id="obstacle3" class="obstacles"></div>
-					<div id="obstacle4" class="obstacles"></div>
-					<div id="obstacle5" class="obstacles"></div>
-					<div id="obstacle6" class="obstacles"></div>
-					<div id="obstacle7" class="obstacles"></div>
-					<div id="obstacle8" class="obstacles"></div>
-					<div id="obstacle9" class="obstacles"></div>
-					<div id="obstacle10" class="obstacles"></div>
-					
-					<div id="restart-block">
-						Press Enter to start playing. Hover your cursor over the green tokens, and avoid the red obstacles. The larger the browser size, the better the experience.
+					<div class="menu"  id="instruction-button">
+						Instructions
 					</div>
 
-					<audio id="scoreSound">
-						<source src="sounds/getPoint.wav">
-						<source src="sounds/getPoint.ogg">
-						<source src="sounds/getPoint.mp3">
-					</audo>
-					<audio id="hitSound">
-						<source src="sounds/hit.wav">
-						<source src="sounds/hit.ogg">
-						<source src="sounds/hit.mp3">
-					</audio>
-			</div>
+					<div class="menu" id="scores-button">
+						Scores
+					</div>
+					<div class="menu"  id="play-button">
+						Play
+					</div>
+					<p class="gameover" id="gameover-title">Game Over!</p><br>
+					<p class="gameover" id="gameover-back">Main Menu</p><br>
+					<p class="gameover" id="gameover-play">Play Again</p>
+					
+					<div id="player"></div>
+					
+
+				
+				<div id="score1" class="scores"></div>
+				<div id="score2" class="scores"></div>
+				<div id="score3" class="scores"></div>
+				<div id="score4" class="scores"></div>
+				<div id="score5" class="scores"></div>
+			
+				
+				<div id="obstacle1" class="obstacles"></div>
+				<div id="obstacle2" class="obstacles"></div>
+				<div id="obstacle3" class="obstacles"></div>
+				<div id="obstacle4" class="obstacles"></div>
+				<div id="obstacle5" class="obstacles"></div>
+				<div id="obstacle6" class="obstacles"></div>
+				<div id="obstacle7" class="obstacles"></div>
+				<div id="obstacle8" class="obstacles"></div>
+				<div id="obstacle9" class="obstacles"></div>
+				<div id="obstacle10" class="obstacles"></div>
+				
+				<audio id="scoreSound">
+					<source src="sounds/getPoint.wav">
+					<source src="sounds/getPoint.ogg">
+					<source src="sounds/getPoint.mp3">
+				</audo>
+				<audio id="hitSound">
+					<source src="sounds/hit.wav">
+					<source src="sounds/hit.ogg">
+					<source src="sounds/hit.mp3">
+				</audio>
+				<audo id="levelUpSound">
+					<source src="sounds/levelUp.wav">
+					<source src="sounds/levelUp.ogg">
+					<source src="sounds/levelUp.mp3">
+				</audio>
 
 	</body>
 	<script>
+	/*
+							T O      D O
+		√ Make a menu regarding...
+			√instructions
+			√a list of scores
+			√A better title-card
+		-A list of high scores.
+		√Fix bugs regarding the player's puck. Sometimes the cursor becomes independent of the puck and does not follow the puck until you either get a point or bring the cursor back to the puck. I think it is caused by a new level, some kind of overloading.
+	THE FOLLOWING ARE THE IDEAS OF THE FAMILY. THESE ARE ALL UP FOR REVIEW
+		√KEITH'S IDEAS
+			√Some punishment for "hanging out"
+				√possibly add a time limit
+
+	*/
+	
+	/*
+		BUG FIXES
+		-Fix the spacing on the scoreboard
+		-When the game ends you can't see your score, set the score to zero WHEN YOU START THE GAME
+		-Issues with dragging:
+			-too hard
+			-You can throw the puck off the screen and not get it back(issues repositiong with draggable elements)
+			-Go back to picking the puck up(God help me)
+	*/
 		$(document).ready(function(){
 			var tracing=false;
-			var paused=false;
 			
 			var scoreCount=0;
+			
 			var sucessSound=document.getElementById("scoreSound");
 			var hitSound=document.getElementById("hitSound");
+			var levelUp=document.getElementById("levelUpSound");
+			
 			var scores=[0];
 			var highScore=0;
+			var backgrounds=["cadetblue", "purple", "maroon", "chocolate", "coral", "cornflowerblue", "brown", "darkgreen", "darkslategray", "firebrick", "darkgoldenrod", "indigo", "mediumaquamarine", "orange", "red", "saddlebrown", "teal", "lime"];
 			
-			var speed=1500;
+			var currentLevel=1;
+
+			var speed=3000;
 			
 			var scoreHeight= 12;
 			var scoreWidth= 12;
 			
+			var levelTime=10000;
 			
 			var calculateMax=function(arr){
 				var max=arr[0];
@@ -128,20 +319,18 @@
 			//For random generation, use the window width and height rather than hard numbers
 			var randomScores=function(){
 				//places scores
-				for(var i=1;i<6;i++)
+				for(var i=0;i<11;i++)
 				{
 					var randX=Math.round(Math.random()*innerWidth)-scoreWidth*4;
 					var randY=20+Math.round(Math.random()*innerHeight)-scoreHeight*4;
-					$("#score"+i).animate({
-						left: randX+"px",
-						top: randY+"px"
-					},350);
+					$("#score"+i).css("top", randY+"px");
+					$("#score"+i).css("left", randX+"px");
 				}
-				$(".scores").fadeIn(1000);
+				$(".scores").fadeIn(100);
 			};
-			var randomObstacles=function(){
-				$(".obstacles").fadeIn(1000);
+			var randomObstacles=function(animSpeed){
 				//places obstacles
+				$(".obstacles").show();
 				for(var i=1;i<11;i++)
 				{
 					var randX=20+Math.round(Math.random()*innerWidth)-24;
@@ -149,141 +338,228 @@
 					$("#obstacle"+i).animate({
 						left: randX+"px",
 						top: randY+"px"
-					},speed);
+					},animSpeed, "swing", function(){
+						$(".obstacles").clearQueue();
+					});
 				}
 			};
-			//resets the board. Clears the line, stops tracing, and (soon) will set the cursor position.
-			var reset=function(){
-				$(".obstacles").hide();
-				$(".obstacles").css("top", "-150px");
-				$(".obstacles").css("left","-150px");
-				$(".scores").hide();
-				$(".scores").css("top", "-150px");
-				$(".scores").css("left","-150px");
-				$(".scores").css("height", "12vh");
-				$(".scores").css("width", "12vh");
-				scoreHeight=12;
-				scoreWidth=12;
-				$("#scoreboard").text("0");
-				$("#scoreboard").css("font-size", "14vh");
-				if(scoreCount == calculateMax(scores))
-					highScore=scoreCount;
-				scoreCount=0;
-				
-				speed=1500;
-				tracing=false;
-				points="";
-				$("#path").attr("points", "");
-				$("#scoreboard").hide();
-				$("#restart-block").show();
-				for(var i=1;i<11;i++)
-				{
-					$("#obstacle"+i).stop(true);
-				}
-				for(var i=1;i<6;i++)
-				{
-					$("#score"+i).stop(true);
-				}
-				
+			
+			var setBackgroundColor=function(currLev){
+				var index=currLev%backgrounds.length;
+				$("body").css("background-color", backgrounds[index]);
+			};
+			var startGame=function(){
+				pickupPlayer();
+				randomScores();
+				$("#timer").show();
+				$("#scorecount").show();
+				animateTimer(levelTime);
 			};
 			var newLevel=function(){
+				currentLevel++;
+				scoreHeight-=0.5;
+				scoreWidth-=0.5;
+				clearBoard();
+				$("#level-notifier").text("Level "+currentLevel);
+				$("#level-notifier").fadeIn(1000).delay(1000).fadeOut(1000);
+				$("#scorecount").hide();
 				randomScores();
-				randomObstacles();
-				$("#restart-block").hide();
+
+				if(scoreHeight > 3 || scoreWidth > 3)
+				{
+					$(".scores").animate({
+						height: "+=10",
+						width: "+=10",
+						top: "-=2",
+						left: "-=2"
+					}, 175).animate({
+						height: scoreHeight+"vh",
+						width: scoreWidth+"vh"
+					}, 175);
+				}
+				if(speed > 1000)
+				{
+					speed -=100;
+					$(".obstacles").stop(true);
+					
+					//randomObstacles(speed);
+				}
+				resetTimer();
+				if(levelTime > 3000)
+					levelTime-=500;
+				animateTimer(levelTime);
+				setBackgroundColor(currentLevel);
 			};
-			$("body").keypress(function(){
-				if(event.which == 13)
+			var gainScore=function(){
+				$("#level-notifier").hide();
+				scoreCount++;
+				$("#scorecount").text("Score :"+scoreCount);
+				$("#scorecount").show();
+				sucessSound.play();
+				sucessSound.currentTime=0;
+				if(scoreCount % 5==0)
 				{
-					if(!paused){
-						tracing=true;
-						newLevel();
-						$(".obstacles").fadeTo(100, 1);
-						$(".scores").fadeTo(100, 1);
-						$("#scoreboard").show();
-						$("#scoreboard").text(""+scoreCount);
-						$("#scoreboard").css("font-size", "83vh");
-						paused=false;
-					}
+					newLevel();	
 				}
-				if(event.which==32)
-				{
-					if(!paused)
-					{
-						paused=true;
-						$(".obstacles").stop(true);
-						$(".obstacles").fadeTo(500, 0.25);
-						$(".scores").fadeTo(500, 0.25);
-						$("#scoreboard").text("Paused. press the Spacebar to resume");
-						$("#scoreboard").css("font-size", "10vh");
-						tracing=false;
-					}
-					else{
-						$(".obstacles").fadeTo(100, 1);
-						$(".scores").fadeTo(100, 1);
-						paused=false;
-						randomObstacles();
-						randomScores();
-						$("scoreboard").css("font-size", "83vh");
-						tracing=true;
-					}
-				}
+			};
+			var clearBoard=function(){
+				$("body").css("background-color", "cadetblue");
+				
+				$(".obstacles").hide();
+				$(".obstacles").stop(true);
+				$(".obstacles").css("top", "-150px");
+				$(".scores").hide();
+			};
+			
+			var animateTimer=function(time){
+				$("#timer").animate({
+					height: "100%"
+				}, levelTime, "linear", function(){
+					loseGame();
+					resetTimer();
+					
+				});
+			};
+			var resetTimer=function(){
+				$("#timer").css("height", "10px");
+				$("#timer").stop();
+			};
+			//resets the board.
+			var reset=function(){
+				//hides the elements and positions them into the far off corner of the board(unseeable by the player)
+				clearBoard();
+				//sets the score sizes to normal
+				scoreHeight=12;
+				scoreWidth=12;
+				
+				
+				$(".scores").css("height", scoreHeight+"vh");
+				$(".scores").css("width", scoreWidth+"vh");
+				
+				//does a bunch of malarkey with the scoreboard, regarding font size and content. Set the scoreboard text to 0
+				$("#scorecount").text("Score: 0");
+				
+				//if the high score is the next one
+				if(scoreCount == calculateMax(scores))
+					highScore=scoreCount;
+				$("#high-score").text("High Score: "+highScore);
+				scoreCount=0;
+				
+				//Things referring to levels of difficulty
+				speed=3000;
+				levelTime=10000;
+				currentLevel=1;
+				tracing=false;
+				
+				
+				$("#player").css("top", "50%");
+				$("#player").css("left", "50%");
+				
+				$("#player").hide();
+				
+				$("#player").css("box-shadow", "");
+				$("#player").css("background-color", "darkblue");
+				$("#player").css("border", "10px dotted blue");
+				$(".obstacles").stop(true);
+				
+			};
+			
+			var loseGame=function(){
+				$("#level-notifier").hide();
+				$(".gameover").show();
+				$("#timer").hide();
+				resetTimer();
+				hitSound.play();
+				reset();
+			};
+			var dropPlayer=function(){
+				tracing=false;
+				$("#player").css("box-shadow", "")
+				$("#player").css("background-color", "darkblue");
+				$("#player").css("border", "10px dotted blue");
+				$(".obstacles").stop();
+			};
+			var pickupPlayer=function(){
+				tracing=true;
+				$("#player").css("box-shadow", "0 0 25px black");
+				$("#player").css("background-color", "blue");
+				$("#player").css("border", "10px dotted royalblue");
+			};
+
+			//Menu events
+			$("#play-button").click(function(){
+				$(".menu").hide();
+				$("#player").fadeIn(500);
+				$("#scoreboard").fadeIn(500);
+				$("#high-score").fadeIn(500);
+				$("#timer").show();
 			});
-			//Traces the line
+			$("#instruction-button").click(function(){
+				$(".menu").hide();
+				$("#instructions").fadeIn(500);
+			});
+			$("#back-button").click(function(){
+				$("#instructions").fadeOut(10);
+				$(".menu").show();
+			});
+			$("#gameover-back").click(function(){
+				$(".gameover").hide();
+				$(".menu").show();
+				$("#high-score").hide();
+			});
+			$("#gameover-play").click(function(){
+				$(".gameover").hide();
+				$("#player").fadeIn(500);
+				$("#scoreboard").fadeIn(500);
+				$("#high-score").fadeIn(500);
+			});
+			
+			
+			//Debugging commands
+			$("body").keypress(function(){
+				if(event.which==96){gainScore();}
+				if(event.which==43){newLevel();}
+				if(event.which==32){dropPlayer();}
+			});
+			//$("#player").draggable({scroll:false});
+			$("#player").click(function(){
+				if(!tracing){
+					startGame();
+				}
+
+			});
 			$("body").mousemove(function(){
 				var x=event.pageX;
 				var y=event.pageY;
 				if(tracing){
-					//drawLine(x,y);
-					//$("#path").attr("points", points);
-					randomObstacles();
-					$("#restart-block").text("GAME OVER: Press Enter to restart! Your score was: "+scoreCount+". The score to beat was: "+highScore);
+					randomObstacles(speed);
+					$("#player").css("top", y+8+"px");
+					$("#player").css("left", x+8+"px");
 				}
 				//$("#debug").text("DEBUG: x="+x+", y="+y);
 			});
 			$(".scores").mouseover(function(){
 				if(tracing)
 				{
+
 					//don't fade out, if you fade out it counts as multiple scores
 					$(this).hide();
-					scoreCount++;
-					$("#scoreboard").text(""+scoreCount);
-					sucessSound.play();
-					sucessSound.currentTime=0;
-					if(scoreCount % 5==0)
-					{
-						randomScores();
-						if(scoreHeight > 3 || scoreWidth > 3)
-						{
-							scoreHeight--;
-							scoreWidth--;
-							$(".scores").animate({
-								height: scoreHeight+"vh",
-								width: scoreWidth+"vh"
-							}, 500);
-						}
-					}
-				}
+					gainScore();
 
+				}
 			});
 			$(".obstacles").mouseover(function(){
 				if(tracing){
 					scores.push(scoreCount);
-					hitSound.play();
-					reset();
+					loseGame();
 				}
 			});
 			$(window).resize(function(){
-				$("#restart-block").css("font-size", "10vh");
-				if(tracing && !paused){
-					$("#scoreboard").css("font-size", "83vh");
+				if(tracing){
 					$(".obstacles").stop(true);
 					$(".scores").stop(true);
-					randomObstacles();
+					randomObstacles(speed);
 					randomScores();
-				}
-				if(paused)
-				{
-					$("#scoreboard").css("font-size", "10vh");
 				}
 
 			});
