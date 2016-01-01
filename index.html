@@ -14,7 +14,6 @@
 		body{
 			background-color: cadetblue;
 			overflow: hidden;
-			cursor: pointer;
 		}
 		/*Defining the scores class*/
 		.scores{
@@ -48,6 +47,7 @@
 			border: 10px dotted blue;
 			border-radius: 25%;
 			
+			cursor: none;
 			position: absolute;
 			top: 50%;
 			left: 50%;
@@ -124,7 +124,10 @@
 		}
 		#back-button{
 			font-size: 75px;
+			font-family: Kavoon;
 			color: beige;
+			position: absolute;
+			left: 43%;
 			text-shadow: 4px 4px 2px black;
 		}
 		#back-button:hover{
@@ -180,9 +183,40 @@
 			display: none;
 			border-top: 5px solid black;
 		}
+		
 		#scorecount{
 			display: none;
 			font-size: 25px;
+		}
+		.scoreboard{
+			display: none;
+			font-family: Kavoon;
+			color: white;
+			text-shadow: 2px 2px 2px black;	
+		}
+		.scoreboard th{
+			font-size: 50px;
+		}
+		.scoreboard td{
+			border: 10px dashed green;
+			background-color: #4dff4d;
+			border-radius: 10px;
+			text-align: center;
+			height: 50px;
+			font-size: 35px;
+		}
+		#scoreboard-back{
+			font-size: 75px;
+			font-family: Kavoon;
+			color: beige;
+			position: absolute;
+			left: 43%;
+			text-shadow: 4px 4px 2px black;
+		}
+		#scoreboard-back:hover{
+			font-size: 80px;
+			text-shadow: 0 0 25px black;
+			color:lightgray;
 		}
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -241,6 +275,13 @@
 				<div id="obstacle9" class="obstacles"></div>
 				<div id="obstacle10" class="obstacles"></div>
 				
+				<table class="scoreboard" style="width: 100%">
+					<tr>
+						<th>Score</th>
+						<th>Date</th>
+					</tr>
+				</table>
+				<span class="scoreboard" id="scoreboard-back">Back</span>
 				<audio id="scoreSound">
 					<source src="sounds/getPoint.wav">
 					<source src="sounds/getPoint.ogg">
@@ -251,11 +292,10 @@
 					<source src="sounds/hit.ogg">
 					<source src="sounds/hit.mp3">
 				</audio>
-				<audo id="levelUpSound">
+				<audio id="levelUpSound">
 					<source src="sounds/levelUp.wav">
-					<source src="sounds/levelUp.ogg">
-					<source src="sounds/levelUp.mp3">
 				</audio>
+				<audio id="swoosh" src="sounds/swoosh.wav"></audio>
 
 	</body>
 	<script>
@@ -265,32 +305,37 @@
 			√instructions
 			√a list of scores
 			√A better title-card
-		-A list of high scores.
+		√A list of scores.
+		√Add more sounds
 		√Fix bugs regarding the player's puck. Sometimes the cursor becomes independent of the puck and does not follow the puck until you either get a point or bring the cursor back to the puck. I think it is caused by a new level, some kind of overloading.
 	THE FOLLOWING ARE THE IDEAS OF THE FAMILY. THESE ARE ALL UP FOR REVIEW
 		√KEITH'S IDEAS
 			√Some punishment for "hanging out"
 				√possibly add a time limit
+		√"Never have two buttons do the same thing" the "play again" button should immediatley pick up the player puck
+		-Effects n' explosions, I guess.
+		√Obstacles move off the screen in new levels instead of opposing
 
 	*/
 	
 	/*
 		BUG FIXES
-		-Fix the spacing on the scoreboard
-		-When the game ends you can't see your score, set the score to zero WHEN YOU START THE GAME
-		-Issues with dragging:
-			-too hard
-			-You can throw the puck off the screen and not get it back(issues repositiong with draggable elements)
-			-Go back to picking the puck up(God help me)
+		√Fix the spacing on the scoreboard
+		√When the game ends you can't see your score, set the score to zero WHEN YOU START THE GAME
+		-Does not work on firefox or internet explorer(not idea how that'll work)
+		√Lag when you're dragging the puck around
 	*/
 		$(document).ready(function(){
 			var tracing=false;
+			var invincible=false;
 			
 			var scoreCount=0;
 			
 			var sucessSound=document.getElementById("scoreSound");
 			var hitSound=document.getElementById("hitSound");
-			var levelUp=document.getElementById("levelUpSound");
+			var levelUpSound=document.getElementById("levelUpSound");
+			var swooshSound=document.getElementById("swoosh");
+
 			
 			var scores=[0];
 			var highScore=0;
@@ -305,6 +350,11 @@
 			
 			var levelTime=10000;
 			
+			var randomWithinRange=function(fromThis, toThis)
+			{
+				var range=(fromThis-toThis)+1;
+				return Math.round(Math.random()*range)+fromThis;
+			};
 			var calculateMax=function(arr){
 				var max=arr[0];
 				for(var i=0;i<arr.length;i++){
@@ -338,12 +388,60 @@
 					$("#obstacle"+i).animate({
 						left: randX+"px",
 						top: randY+"px"
-					},animSpeed, "swing", function(){
-						$(".obstacles").clearQueue();
+					}, {
+						duration: animSpeed,
+						easing: "swing",
+						start: function(){
+							swooshSound.play();
+							swooshSound.currentTime=0;
+						}
+						
 					});
 				}
 			};
-			
+			var hideObstacles=function(){
+				for(var i=1;i<11;i++)
+				{
+					var side=Math.round(Math.random()*3)+1;
+					var x;
+					var y;
+					var offset=100;
+					switch (side) {
+						case 1:
+							 x=offset*-1;
+							 y=offset*-1;
+							break;
+						case 2:
+							x=innerWidth+offset;
+							y=offset-1;
+							break;
+						case 3:
+							x=innerWidth+offset;
+							y=innerHeight+offset;
+							break;
+						case 4:
+							x=offset*-1;
+							y=innerHeight+offset;
+							break;
+						default:
+							break;
+					}
+					$("#obstacle"+i).animate({
+						left: x+"px",
+						top: y+"px"
+					}, {
+						duration: 500,
+						easing: "swing",
+						start: function(){
+							invincible=true;
+						},
+						done:function(){
+							invincible=false;
+						}
+						
+					});
+				}
+			};
 			var setBackgroundColor=function(currLev){
 				var index=currLev%backgrounds.length;
 				$("body").css("background-color", backgrounds[index]);
@@ -351,11 +449,14 @@
 			var startGame=function(){
 				pickupPlayer();
 				randomScores();
+				hideObstacles();
 				$("#timer").show();
 				$("#scorecount").show();
+				$("#scorecount").text("Score : 0");
 				animateTimer(levelTime);
 			};
 			var newLevel=function(){
+				levelUpSound.play();
 				currentLevel++;
 				scoreHeight-=0.5;
 				scoreWidth-=0.5;
@@ -365,6 +466,7 @@
 				$("#scorecount").hide();
 				randomScores();
 
+				hideObstacles();
 				if(scoreHeight > 3 || scoreWidth > 3)
 				{
 					$(".scores").animate({
@@ -380,8 +482,8 @@
 				if(speed > 1000)
 				{
 					speed -=100;
-					$(".obstacles").stop(true);
 					
+					//$(".obstacles").stop(true);
 					//randomObstacles(speed);
 				}
 				resetTimer();
@@ -393,7 +495,7 @@
 			var gainScore=function(){
 				$("#level-notifier").hide();
 				scoreCount++;
-				$("#scorecount").text("Score :"+scoreCount);
+				$("#scorecount").text("Score: "+scoreCount);
 				$("#scorecount").show();
 				sucessSound.play();
 				sucessSound.currentTime=0;
@@ -402,12 +504,19 @@
 					newLevel();	
 				}
 			};
+			//When you lose the game
 			var clearBoard=function(){
 				$("body").css("background-color", "cadetblue");
 				
 				$(".obstacles").hide();
+//				for(var i=1;i<11;i++)
+//				{
+//					var randX=(20+Math.round(Math.random()*innerWidth)-24)*-1;
+//					var randY=(20+Math.round(Math.random()*innerHeight)-24)*-1;
+//					$("obstacle"+i).css("top", randY+"px");
+//					$("obstacle"+i).css("left", randX+"px");
+//				}
 				$(".obstacles").stop(true);
-				$(".obstacles").css("top", "-150px");
 				$(".scores").hide();
 			};
 			
@@ -424,6 +533,17 @@
 				$("#timer").css("height", "10px");
 				$("#timer").stop();
 			};
+			var getTime=function(){
+				var d=new Date();
+				var hours=d.getHours();
+				var minutes=d.getMinutes();
+				var seconds=d.getSeconds();
+				return hours+":"+minutes+":"+seconds;
+			};
+			var addToScoreboard=function(score, date){
+				var row="<tr><td>"+score+"</td><td>"+date+"</td></tr>";
+				$(row).appendTo("table.scoreboard");
+			};
 			//resets the board.
 			var reset=function(){
 				//hides the elements and positions them into the far off corner of the board(unseeable by the player)
@@ -436,8 +556,6 @@
 				$(".scores").css("height", scoreHeight+"vh");
 				$(".scores").css("width", scoreWidth+"vh");
 				
-				//does a bunch of malarkey with the scoreboard, regarding font size and content. Set the scoreboard text to 0
-				$("#scorecount").text("Score: 0");
 				
 				//if the high score is the next one
 				if(scoreCount == calculateMax(scores))
@@ -469,6 +587,7 @@
 				$(".gameover").show();
 				$("#timer").hide();
 				resetTimer();
+				addToScoreboard(scoreCount, getTime());
 				hitSound.play();
 				reset();
 			};
@@ -490,36 +609,55 @@
 			$("#play-button").click(function(){
 				$(".menu").hide();
 				$("#player").fadeIn(500);
-				$("#scoreboard").fadeIn(500);
+				$("#scorecount").fadeIn(500);
 				$("#high-score").fadeIn(500);
 				$("#timer").show();
 			});
+			
 			$("#instruction-button").click(function(){
 				$(".menu").hide();
 				$("#instructions").fadeIn(500);
 			});
 			$("#back-button").click(function(){
-				$("#instructions").fadeOut(10);
+				$("#instructions").hide();
 				$(".menu").show();
 			});
+			
+			$("#scores-button").click(function(){
+				$(".menu").hide();
+				$(".scoreboard").fadeIn(500);
+			});
+			$("#scoreboard-back").click(function(){
+				$(".scoreboard").hide();
+				$(".menu").show();
+			});
+			
 			$("#gameover-back").click(function(){
 				$(".gameover").hide();
 				$(".menu").show();
 				$("#high-score").hide();
+				$("#scorecount").hide();
 			});
 			$("#gameover-play").click(function(){
 				$(".gameover").hide();
 				$("#player").fadeIn(500);
-				$("#scoreboard").fadeIn(500);
+				$("#scorecount").fadeIn(500);
 				$("#high-score").fadeIn(500);
 			});
 			
-			
 			//Debugging commands
+			
+			//TAB to gain score
+			//+ to go to a new level
+			//ENTER to drop the player
+			//* to stop the timer
+			//& to resume the timer
 			$("body").keypress(function(){
 				if(event.which==96){gainScore();}
 				if(event.which==43){newLevel();}
 				if(event.which==32){dropPlayer();}
+				if(event.which==42){$("#timer").stop();}
+				if(event.which==38){$("#timer").stop();}
 			});
 			//$("#player").draggable({scroll:false});
 			$("#player").click(function(){
@@ -528,7 +666,7 @@
 				}
 
 			});
-			$("body").mousemove(function(){
+			$("*").mousemove(function(){
 				var x=event.pageX;
 				var y=event.pageY;
 				if(tracing){
@@ -539,7 +677,7 @@
 				//$("#debug").text("DEBUG: x="+x+", y="+y);
 			});
 			$(".scores").mouseover(function(){
-				if(tracing)
+				if(tracing && !invincible)
 				{
 
 					//don't fade out, if you fade out it counts as multiple scores
@@ -549,7 +687,7 @@
 				}
 			});
 			$(".obstacles").mouseover(function(){
-				if(tracing){
+				if(tracing && !invincible){
 					scores.push(scoreCount);
 					loseGame();
 				}
